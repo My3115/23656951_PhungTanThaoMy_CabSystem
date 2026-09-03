@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: BR06 - Quản lý tài xế
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR06
+  description: Quản lý tài xế
+paths:
+  /api/drivers:
+    post:
+      tags:
+      - BR06
+      summary: Đăng ký hoặc tạo tài khoản tài xế
+      description: 'BR06 - FR01: Đăng ký hoặc tạo tài khoản tài xế'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/drivers/me:
+    patch:
+      tags:
+      - BR06
+      summary: Cập nhật hồ sơ tài xế
+      description: 'BR06 - FR02: Cập nhật hồ sơ tài xế'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/drivers/me/vehicle:
+    patch:
+      tags:
+      - BR06
+      summary: Quản lý thông tin phương tiện
+      description: 'BR06 - FR03: Quản lý thông tin phương tiện'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/drivers/me/availability:
+    patch:
+      tags:
+      - BR06
+      summary: Cập nhật trạng thái hoạt động
+      description: 'BR06 - FR04: Cập nhật trạng thái hoạt động'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true

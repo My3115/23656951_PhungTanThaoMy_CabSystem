@@ -1,0 +1,97 @@
+openapi: 3.0.3
+info:
+  title: BR02 - Tìm và phân công tài xế
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR02
+  description: Tìm và phân công tài xế
+paths:
+  /api/driver-assignment/matching:
+    get:
+      tags:
+      - BR02
+      summary: Xác định tài xế phù hợp
+      description: 'BR02 - FR01: Xác định tài xế phù hợp'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+  /api/driver-assignment/requests:
+    post:
+      tags:
+      - BR02
+      summary: Gửi yêu cầu cho tài xế
+      description: 'BR02 - FR02: Gửi yêu cầu cho tài xế'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/driver-assignment/requests/{requestId}/handle-response:
+    post:
+      tags:
+      - BR02
+      summary: Xử lý tài xế từ chối/không phản hồi
+      description: 'BR02 - FR03: Xử lý tài xế từ chối/không phản hồi'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/driver-assignment/search-next:
+    post:
+      tags:
+      - BR02
+      summary: Tiếp tục tìm tài xế khác
+      description: 'BR02 - FR04: Tiếp tục tìm tài xế khác'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true

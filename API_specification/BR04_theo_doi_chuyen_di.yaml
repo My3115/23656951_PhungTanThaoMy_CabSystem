@@ -1,0 +1,94 @@
+openapi: 3.0.3
+info:
+  title: BR04 - Theo dõi chuyến đi
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR04
+  description: Theo dõi chuyến đi
+paths:
+  /api/trips/{tripId}/status:
+    get:
+      tags:
+      - BR04
+      summary: Hiển thị trạng thái chuyến đi
+      description: 'BR04 - FR01: Hiển thị trạng thái chuyến đi'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/trips/{tripId}/driver:
+    get:
+      tags:
+      - BR04
+      summary: Hiển thị thông tin tài xế
+      description: 'BR04 - FR02: Hiển thị thông tin tài xế'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/trips/{tripId}/driver-location:
+    get:
+      tags:
+      - BR04
+      summary: Hiển thị vị trí tài xế
+      description: 'BR04 - FR03: Hiển thị vị trí tài xế'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/trips/{tripId}/eta:
+    get:
+      tags:
+      - BR04
+      summary: Hiển thị thời gian dự kiến tài xế đến
+      description: 'BR04 - FR04: Hiển thị thời gian dự kiến tài xế đến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
