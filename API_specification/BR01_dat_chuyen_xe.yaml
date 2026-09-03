@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: Đặt chuyến xe
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: Đặt chuyến xe
+  description: Đặt chuyến xe
+paths:
+  /api/bookings/pickup:
+    post:
+      tags:
+      - Đặt chuyến xe
+      summary: Nhập điểm đón
+      description: 'BR01 - FR01.1: Nhập điểm đón'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/bookings/destination:
+    post:
+      tags:
+      - Đặt chuyến xe
+      summary: Nhập điểm đến
+      description: 'BR01 - FR01.2: Nhập điểm đến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/bookings/vehicle-type:
+    post:
+      tags:
+      - BR01
+      summary: Chọn loại xe
+      description: 'BR01 - FR01.3: Chọn loại xe'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/bookings:
+    post:
+      tags:
+      - BR01
+      summary: Gửi yêu cầu đặt chuyến
+      description: 'BR01 - FR01.4: Gửi yêu cầu đặt chuyến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
