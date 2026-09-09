@@ -1,0 +1,120 @@
+openapi: 3.0.3
+info:
+  title: BR08 - Quản lý thông báo
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR08
+  description: Quản lý thông báo
+paths:
+  /api/notifications/booking-received:
+    post:
+      tags:
+      - BR08
+      summary: Thông báo tiếp nhận yêu cầu đặt xe
+      description: 'BR08 - FR01: Thông báo tiếp nhận yêu cầu đặt xe'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/notifications/driver-accepted:
+    post:
+      tags:
+      - BR08
+      summary: Thông báo tài xế nhận chuyến
+      description: 'BR08 - FR02: Thông báo tài xế nhận chuyến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/notifications/driver-arrived:
+    post:
+      tags:
+      - BR08
+      summary: Thông báo tài xế đến điểm đón
+      description: 'BR08 - FR03: Thông báo tài xế đến điểm đón'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/notifications/trip-completed:
+    post:
+      tags:
+      - BR08
+      summary: Thông báo hoàn thành chuyến
+      description: 'BR08 - FR04: Thông báo hoàn thành chuyến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/notifications/payment-result:
+    post:
+      tags:
+      - BR08
+      summary: Thông báo kết quả thanh toán
+      description: 'BR08 - FR05: Thông báo kết quả thanh toán'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true

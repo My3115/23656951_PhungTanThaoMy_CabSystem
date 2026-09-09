@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: BR05 - Quản lý khách hàng
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR05
+  description: Quản lý khách hàng
+paths:
+  /api/customers/register:
+    post:
+      tags:
+      - BR05
+      summary: Đăng ký tài khoản
+      description: 'BR05 - FR01: Đăng ký tài khoản'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/customers/login:
+    post:
+      tags:
+      - BR05
+      summary: Đăng nhập
+      description: 'BR05 - FR02: Đăng nhập'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/customers/me:
+    patch:
+      tags:
+      - BR05
+      summary: Cập nhật thông tin cá nhân
+      description: 'BR05 - FR03: Cập nhật thông tin cá nhân'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/customers/me/trips:
+    get:
+      tags:
+      - BR05
+      summary: Xem lịch sử chuyến đi
+      description: 'BR05 - FR04: Xem lịch sử chuyến đi'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống

@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: BR03 - Quản lý chuyến đi
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR03
+  description: Quản lý chuyến đi
+paths:
+  /api/trips/{tripId}/accept:
+    post:
+      tags:
+      - BR03
+      summary: Tài xế nhận chuyến
+      description: 'BR03 - FR01: Tài xế nhận chuyến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/trips/{tripId}/status/arrived:
+    patch:
+      tags:
+      - BR03
+      summary: Cập nhật đã đến điểm đón
+      description: 'BR03 - FR02: Cập nhật đã đến điểm đón'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/trips/{tripId}/status/picked-up:
+    patch:
+      tags:
+      - BR03
+      summary: Cập nhật đã đón khách
+      description: 'BR03 - FR03: Cập nhật đã đón khách'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/trips/{tripId}/status/in-progress:
+    patch:
+      tags:
+      - BR03
+      summary: Cập nhật đang di chuyển
+      description: 'BR03 - FR04: Cập nhật đang di chuyển'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/trips/{tripId}/status/completed:
+    patch:
+      tags:
+      - BR03
+      summary: Cập nhật hoàn thành chuyến
+      description: 'BR03 - FR05: Cập nhật hoàn thành chuyến'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true

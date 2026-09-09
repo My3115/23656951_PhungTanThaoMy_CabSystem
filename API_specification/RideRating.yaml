@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  title: BR09 - Đánh giá chuyến xe
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR09
+  description: Đánh giá chuyến xe
+paths:
+  /api/trips/{tripId}/completed-info:
+    get:
+      tags:
+      - BR09
+      summary: Hiển thị thông tin chuyến đã hoàn thành
+      description: 'BR09 - FR01: Hiển thị thông tin chuyến đã hoàn thành'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/trips/{tripId}/rating:
+    post:
+      tags:
+      - BR09
+      summary: Đánh giá tài xế
+      description: 'BR09 - FR02: Đánh giá tài xế'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/ratings:
+    post:
+      tags:
+      - BR09
+      summary: Ghi nhận đánh giá
+      description: 'BR09 - FR03: Ghi nhận đánh giá'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true

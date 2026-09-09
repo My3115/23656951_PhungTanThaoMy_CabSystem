@@ -1,0 +1,131 @@
+openapi: 3.0.3
+info:
+  title: BR07 - Tính cước và thanh toán
+  version: 1.0.0
+servers:
+- url: https://api.example.com
+tags:
+- name: BR07
+  description: Tính cước và thanh toán
+paths:
+  /api/trips/{tripId}/fare/calculate:
+    post:
+      tags:
+      - BR07
+      summary: Tính cước chuyến xe
+      description: 'BR07 - FR01: Tính cước chuyến xe'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/trips/{tripId}/fare:
+    get:
+      tags:
+      - BR07
+      summary: Hiển thị số tiền phải trả
+      description: 'BR07 - FR02: Hiển thị số tiền phải trả'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/payments/cash:
+    post:
+      tags:
+      - BR07
+      summary: Thanh toán bằng tiền mặt
+      description: 'BR07 - FR03: Thanh toán bằng tiền mặt'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/payments/electronic:
+    post:
+      tags:
+      - BR07
+      summary: Thanh toán điện tử
+      description: 'BR07 - FR04: Thanh toán điện tử'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+  /api/payments/{paymentId}/failure:
+    post:
+      tags:
+      - BR07
+      summary: Xử lý thanh toán thất bại
+      description: 'BR07 - FR05: Xử lý thanh toán thất bại'
+      responses:
+        '200':
+          description: Thành công
+        '400':
+          description: Yêu cầu không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Lỗi hệ thống
+      parameters:
+      - name: paymentId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
