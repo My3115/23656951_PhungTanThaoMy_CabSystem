@@ -540,3 +540,11 @@ bg nào tuong ứng thành pr nào - pr phân rã thành fr nào - fr tưong ứ
 | BG06: Đảm bảo tính liên tục của dịch vụ | BR14: Đảm bảo tính liên tục | FR14.1 Xử lý lỗi thanh toán<br>FR14.2 Xử lý lỗi thông báo<br>FR14.3 Duy trì chức năng khác | UC13: Thanh toán<br>UC14: Quản lý thông báo | AC12 |
 | BG07: Đảm bảo an toàn và bảo mật | BR12: Bảo mật và phân quyền | FR12.1 Xác thực<br>FR12.2 Phân quyền<br>FR12.3 Bảo vệ dữ liệu<br>FR12.4 Lưu vết | UC01: Đăng ký / Đăng nhập<br>UC22: Quản lý phân quyền<br>UC23: Quản lý bảo mật | AC11 |
 | BG08: Đảm bảo khả năng mở rộng | BR13: Khả năng mở rộng | FR13.1 Bổ sung dịch vụ<br>FR13.2 Bổ sung phương thức thanh toán<br>FR13.3 Bổ sung kênh thông báo | UC12: Thanh toán<br>UC14: Quản lý thông báo | — |
+
+## Buổi 3
+sinh ra các ngữ cảnh -> copy đường dẫn github -> bảo chat học tài liệu -> rồi xáy dụng ngữ cảnh kiểm thử-> sinh ra testcase(input, tham số cần thiết -> output kì vọng) 
+- không chỉ sinh ra testcase luôn luôn đúng -> phải sinh ra testcase sai( không theo ngữ cảnh, ví dụ đặt xe: lấy không đươc vị trí của người dùng thì sao).
+
+
+
+
