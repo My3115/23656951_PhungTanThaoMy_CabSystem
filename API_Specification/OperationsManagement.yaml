@@ -1,0 +1,362 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Operations and Reporting API
+  version: 1.0.0
+  description: API cho UC15, UC16, UC17, UC18, UC19 và UC20. Các API vận hành chỉ
+    dành cho Nhân viên vận hành có quyền phù hợp. Các thao tác nhạy cảm phải được
+    phân quyền và lưu vết theo yêu cầu bảo mật.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Operations
+- name: Reports
+paths:
+  /operations/customers:
+    get:
+      tags:
+      - Operations
+      summary: Quản lý khách hàng
+      operationId: manageCustomers
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách khách hàng
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerOperation'
+        '403':
+          description: Không đủ quyền
+        '401':
+          description: Chưa xác thực
+      description: Chức năng tra cứu/quản lý vận hành; quyền truy cập phụ thuộc vai
+        trò của Nhân viên vận hành.
+    parameters:
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /operations/drivers:
+    get:
+      tags:
+      - Operations
+      summary: Quản lý tài xế
+      operationId: manageDrivers
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách tài xế
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DriverOperation'
+        '403':
+          description: Không đủ quyền
+        '401':
+          description: Chưa xác thực
+      description: Chức năng tra cứu/quản lý vận hành; quyền truy cập phụ thuộc vai
+        trò của Nhân viên vận hành.
+    parameters:
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /operations/vehicles:
+    get:
+      tags:
+      - Operations
+      summary: Quản lý phương tiện
+      operationId: manageVehicles
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách phương tiện
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleOperation'
+        '403':
+          description: Không đủ quyền
+        '401':
+          description: Chưa xác thực
+      description: Chức năng tra cứu/quản lý vận hành; quyền truy cập phụ thuộc vai
+        trò của Nhân viên vận hành.
+    parameters:
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /operations/trips/ongoing:
+    get:
+      tags:
+      - Operations
+      summary: Theo dõi các chuyến đang diễn ra
+      operationId: getOngoingTrips
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách chuyến đang diễn ra
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OngoingTrip'
+        '403':
+          description: Không đủ quyền
+        '401':
+          description: Chưa xác thực
+      description: Chỉ Nhân viên vận hành có quyền phù hợp mới được sử dụng.
+    parameters:
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /operations/transactions:
+    get:
+      tags:
+      - Operations
+      summary: Tra cứu lịch sử giao dịch
+      operationId: getTransactionHistory
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách giao dịch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        '403':
+          description: Không đủ quyền
+        '401':
+          description: Chưa xác thực
+      description: Chỉ Nhân viên vận hành có quyền phù hợp mới được sử dụng.
+    parameters:
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /reports/summary:
+    get:
+      tags:
+      - Reports
+      summary: Báo cáo và thống kê vận hành
+      operationId: getOperationsReport
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: tuNgay
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: denNgay
+        required: true
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Báo cáo số chuyến, doanh thu, tỷ lệ hoàn thành, tỷ lệ hủy và
+            hiệu quả tài xế
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationsReport'
+        '403':
+          description: Không đủ quyền
+      description: Chỉ Nhân viên vận hành có quyền phù hợp mới được sử dụng.
+components:
+  schemas:
+    OperationsReport:
+      type: object
+      properties:
+        soLuongChuyen:
+          type: integer
+        doanhThu:
+          type: number
+          format: double
+        tyLeHoanThanh:
+          type: number
+          format: double
+        tyLeHuy:
+          type: number
+          format: double
+        hieuQuaTaiXe:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriverPerformance'
+    DriverPerformance:
+      type: object
+      properties:
+        maTX:
+          type: integer
+        soChuyen:
+          type: integer
+        soChuyenHoanThanh:
+          type: integer
+    CustomerOperation:
+      type: object
+      properties:
+        maKH:
+          type: integer
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+    DriverOperation:
+      type: object
+      properties:
+        maTX:
+          type: integer
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        trangThaiHoatDong:
+          type: string
+          enum:
+          - SAN_SANG
+          - BAN
+          - OFFLINE
+    VehicleOperation:
+      type: object
+      properties:
+        maPT:
+          type: integer
+        maTX:
+          type: integer
+        bienSo:
+          type: string
+        loaiXe:
+          type: string
+        trangThai:
+          type: string
+    Transaction:
+      type: object
+      properties:
+        maThanhToan:
+          type: integer
+        maChuyen:
+          type: integer
+        soTien:
+          type: number
+          format: double
+        phuongThuc:
+          type: string
+          enum:
+          - CASH
+          - E_PAYMENT
+        trangThai:
+          type: string
+          enum:
+          - CHO_THANH_TOAN
+          - THANH_CONG
+          - THAT_BAI
+        thoiGianThanhToan:
+          type: string
+          format: date-time
+          nullable: true
+    OngoingTrip:
+      type: object
+      properties:
+        maChuyen:
+          type: integer
+        maKH:
+          type: integer
+        maTX:
+          type: integer
+          nullable: true
+        diemDon:
+          type: string
+        diemDen:
+          type: string
+        trangThai:
+          type: string
+        thoiGianDuKienDen:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

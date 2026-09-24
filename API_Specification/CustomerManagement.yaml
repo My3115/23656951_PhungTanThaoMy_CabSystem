@@ -1,0 +1,304 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Customer Management API
+  version: 1.0.0
+  description: API cho UC01, UC02, UC05 và chức năng tra cứu khách hàng của vận hành.
+    Đăng nhập dùng chung cho các nhóm người dùng; đăng ký khách hàng được thực hiện
+    tại API này.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Authentication
+- name: Customer Management
+paths:
+  /auth/register:
+    post:
+      tags:
+      - Authentication
+      summary: Đăng ký tài khoản khách hàng
+      operationId: registerCustomer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterCustomerRequest'
+      responses:
+        '201':
+          description: Đăng ký thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Thông tin đăng ký không hợp lệ
+        '409':
+          description: Tài khoản đã tồn tại
+  /auth/login:
+    post:
+      tags:
+      - Authentication
+      summary: Đăng nhập hệ thống
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Đăng nhập thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Thông tin đăng nhập không chính xác
+  /customers/me:
+    get:
+      tags:
+      - Customer Management
+      summary: Xem thông tin cá nhân
+      operationId: getMyCustomer
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Thông tin khách hàng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '401':
+          description: Chưa xác thực
+    put:
+      tags:
+      - Customer Management
+      summary: Cập nhật thông tin cá nhân
+      operationId: updateMyCustomer
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerProfileUpdate'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Dữ liệu không hợp lệ
+        '401':
+          description: Chưa xác thực
+  /customers/me/trips:
+    get:
+      tags:
+      - Customer Management
+      summary: Xem lịch sử chuyến đi
+      operationId: getMyTripHistory
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách lịch sử chuyến
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TripSummary'
+  /customers:
+    get:
+      tags:
+      - Customer Management
+      summary: Nhân viên vận hành tra cứu khách hàng
+      operationId: listCustomers
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: keyword
+        schema:
+          type: string
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - in: query
+        name: size
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Danh sách khách hàng
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+        '403':
+          description: Không đủ quyền
+      description: Chỉ Nhân viên vận hành có quyền phù hợp mới được sử dụng API này.
+  /customers/{maKH}:
+    get:
+      tags:
+      - Customer Management
+      summary: Xem khách hàng
+      operationId: getCustomer
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maKH
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Thông tin khách hàng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Không tìm thấy khách hàng
+        '403':
+          description: Không đủ quyền
+      description: Chỉ Nhân viên vận hành có quyền phù hợp mới được sử dụng API này.
+components:
+  schemas:
+    RegisterCustomerRequest:
+      type: object
+      required:
+      - hoTen
+      - soDienThoai
+      - email
+      - matKhau
+      properties:
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+        matKhau:
+          type: string
+          format: password
+    LoginRequest:
+      type: object
+      required:
+      - email
+      - matKhau
+      properties:
+        email:
+          type: string
+          format: email
+        matKhau:
+          type: string
+          format: password
+        vaiTro:
+          type: string
+          enum:
+          - KHACH_HANG
+          - TAI_XE
+          - NHAN_VIEN_VAN_HANH
+          description: Vai trò có thể được dùng khi hệ thống yêu cầu xác định loại
+            tài khoản; nếu không cần, hệ thống xác định từ tài khoản.
+    LoginResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        user:
+          type: object
+          properties:
+            maTaiKhoan:
+              type: integer
+            hoTen:
+              type: string
+            email:
+              type: string
+              format: email
+        vaiTro:
+          type: string
+          enum:
+          - KHACH_HANG
+          - TAI_XE
+          - NHAN_VIEN_VAN_HANH
+    Customer:
+      type: object
+      properties:
+        maKH:
+          type: integer
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+    CustomerProfileUpdate:
+      type: object
+      properties:
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+    TripSummary:
+      type: object
+      properties:
+        maChuyen:
+          type: integer
+        diemDon:
+          type: string
+        diemDen:
+          type: string
+        trangThai:
+          type: string
+        soTien:
+          type: number
+          format: double
+          nullable: true
+        thoiGianBatDau:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

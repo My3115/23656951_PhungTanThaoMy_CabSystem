@@ -1,0 +1,201 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Book Ride API
+  version: 1.0.0
+  description: API cho UC03 - Đặt chuyến xe. Tạo và tra cứu yêu cầu đặt chuyến. Chính
+    sách hủy chuyến hiện chưa được doanh nghiệp chốt nên chưa cung cấp API hủy chính
+    thức.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Ride Booking
+  description: Tạo và tra cứu yêu cầu đặt chuyến
+paths:
+  /booking-requests:
+    post:
+      tags:
+      - Ride Booking
+      summary: Tạo yêu cầu đặt chuyến
+      operationId: createBookingRequest
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Tạo yêu cầu đặt chuyến thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Thiếu hoặc sai thông tin điểm đón
+          điểm đến hoặc loại xe: null
+        '401':
+          description: Chưa xác thực
+        '500':
+          description: Không thể tạo yêu cầu
+    get:
+      tags:
+      - Ride Booking
+      summary: Xem lịch sử yêu cầu đặt chuyến của khách hàng
+      operationId: listMyBookingRequests
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+      - in: query
+        name: size
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+      responses:
+        '200':
+          description: Danh sách yêu cầu đặt chuyến
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+        '401':
+          description: Chưa xác thực
+  /booking-requests/{maYeuCau}:
+    get:
+      tags:
+      - Ride Booking
+      summary: Xem chi tiết yêu cầu đặt chuyến
+      operationId: getBookingRequest
+      security:
+      - bearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/BookingId'
+      responses:
+        '200':
+          description: Chi tiết yêu cầu đặt chuyến
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          description: Không tìm thấy yêu cầu
+components:
+  parameters:
+    BookingId:
+      in: path
+      name: maYeuCau
+      required: true
+      schema:
+        type: integer
+        example: 5001
+  schemas:
+    CreateBookingRequest:
+      type: object
+      required:
+      - diemDon
+      - diemDen
+      - loaiXe
+      properties:
+        diemDon:
+          type: string
+          example: Đại học Công nghiệp TP.HCM
+        diemDen:
+          type: string
+          example: Sân bay Tân Sơn Nhất
+        loaiXe:
+          type: string
+          example: CAR_4_SEATS
+    Booking:
+      type: object
+      required:
+      - maYeuCau
+      - maKH
+      - diemDon
+      - diemDen
+      - loaiXe
+      - thoiGianTao
+      - trangThai
+      properties:
+        maYeuCau:
+          type: integer
+          example: 5001
+        maKH:
+          type: integer
+          example: 1001
+        diemDon:
+          type: string
+        diemDen:
+          type: string
+        loaiXe:
+          type: string
+        thoiGianTao:
+          type: string
+          format: date-time
+        trangThai:
+          type: string
+          enum:
+          - CHO_TIM_TAI_XE
+          - CHO_TAI_XE_PHAN_HOI
+          - DA_CO_TAI_XE
+          - KHONG_TIM_THAY_TAI_XE
+          - DA_HUY
+        maChuyen:
+          type: integer
+          nullable: true
+    BookingStatus:
+      type: object
+      required:
+      - maYeuCau
+      - trangThai
+      properties:
+        maYeuCau:
+          type: integer
+        trangThai:
+          type: string
+          enum:
+          - CHO_TIM_TAI_XE
+          - CHO_TAI_XE_PHAN_HOI
+          - DA_CO_TAI_XE
+          - KHONG_TIM_THAY_TAI_XE
+          - DA_HUY
+        maTX:
+          type: integer
+          nullable: true
+        maChuyen:
+          type: integer
+          nullable: true
+        thoiGianDuKienDen:
+          type: string
+          format: date-time
+          nullable: true
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

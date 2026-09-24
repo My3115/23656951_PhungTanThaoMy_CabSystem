@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Ride Rating API
+  version: 1.0.0
+  description: API cho UC06 - Đánh giá tài xế sau khi chuyến đi hoàn thành.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Ride Rating
+paths:
+  /reviews:
+    post:
+      tags:
+      - Ride Rating
+      summary: Đánh giá tài xế sau khi chuyến hoàn thành
+      operationId: createReview
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: Ghi nhận đánh giá
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '400':
+          description: Chuyến chưa hoàn thành hoặc dữ liệu đánh giá không hợp lệ
+        '409':
+          description: Chuyến đã được đánh giá
+        '401':
+          description: Chưa xác thực
+        '403':
+          description: Không phải khách hàng của chuyến
+        '404':
+          description: Không tìm thấy chuyến
+  /trips/{maChuyen}/review:
+    get:
+      tags:
+      - Ride Rating
+      summary: Xem đánh giá của chuyến
+      operationId: getTripReview
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Thông tin đánh giá
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          description: Chưa có đánh giá hoặc không tìm thấy chuyến
+        '401':
+          description: Chưa xác thực
+components:
+  schemas:
+    CreateReviewRequest:
+      type: object
+      required:
+      - maChuyen
+      - soSao
+      properties:
+        maChuyen:
+          type: integer
+        soSao:
+          type: integer
+          minimum: 1
+          maximum: 5
+        noiDung:
+          type: string
+    Review:
+      type: object
+      properties:
+        maDanhGia:
+          type: integer
+        maChuyen:
+          type: integer
+        maKH:
+          type: integer
+        soSao:
+          type: integer
+        noiDung:
+          type: string
+        thoiGianDanhGia:
+          type: string
+          format: date-time
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

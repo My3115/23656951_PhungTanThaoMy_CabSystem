@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Notification API
+  version: 1.0.0
+  description: API cho UC14 - Gửi và nhận thông báo. Hệ thống phát thông báo từ các
+    sự kiện nghiệp vụ quan trọng; kênh và nhà cung cấp thông báo có thể mở rộng trong
+    tương lai.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Notification Management
+paths:
+  /notifications:
+    get:
+      tags:
+      - Notification Management
+      summary: Xem danh sách thông báo
+      operationId: listNotifications
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách thông báo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+    parameters:
+    - in: query
+      name: daDoc
+      schema:
+        type: boolean
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /notifications/{id}/read:
+    patch:
+      tags:
+      - Notification Management
+      summary: Đánh dấu thông báo đã đọc
+      operationId: markNotificationRead
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Đánh dấu đã đọc thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '404':
+          description: Không tìm thấy thông báo
+  /notifications/events:
+    post:
+      tags:
+      - Notification Management
+      summary: Tiếp nhận sự kiện để phát thông báo
+      operationId: publishNotificationEvent
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationEvent'
+      responses:
+        '202':
+          description: Sự kiện đã được tiếp nhận để xử lý thông báo
+        '503':
+          description: Dịch vụ thông báo tạm thời không khả dụng; chức năng chính
+            của hệ thống không bị dừng
+      description: API nội bộ/giữa các thành phần có quyền của hệ thống để tiếp nhận
+        sự kiện nghiệp vụ và phát thông báo. Không phải thao tác mà khách hàng hoặc
+        tài xế phải thực hiện trực tiếp.
+components:
+  schemas:
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Mã thông báo
+        loaiSuKien:
+          type: string
+          enum:
+          - TIEP_NHAN_YEU_CAU
+          - TAI_XE_NHAN_CHUYEN
+          - TAI_XE_DEN
+          - CHUYEN_HOAN_THANH
+          - KET_QUA_THANH_TOAN
+          - CHUYEN_MOI
+          - THAY_DOI_CHUYEN
+        noiDung:
+          type: string
+        daDoc:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    NotificationEvent:
+      type: object
+      required:
+      - loaiSuKien
+      - doiTuongId
+      properties:
+        loaiSuKien:
+          type: string
+        doiTuongId:
+          type: integer
+        noiDung:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

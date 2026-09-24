@@ -1,0 +1,374 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Trip Management API
+  version: 1.0.0
+  description: API cho UC09, UC10, UC17 và UC18. Trip được tạo khi hệ thống bắt đầu
+    phân công tài xế thành công. Nếu tài xế từ chối hoặc không phản hồi, hệ thống
+    tự động tiếp tục tìm tài xế khác; khách hàng không cần tạo lại yêu cầu.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Trip Management
+- name: Trip Incident
+paths:
+  /drivers/me/trip-requests:
+    get:
+      tags:
+      - Trip Management
+      summary: Xem các yêu cầu chuyến được đề xuất
+      operationId: listDriverTripRequests
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách yêu cầu chuyến
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trip'
+  /trips/{maChuyen}/accept:
+    post:
+      tags:
+      - Trip Management
+      summary: Tài xế nhận chuyến
+      operationId: acceptTrip
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Nhận chuyến thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '409':
+          description: Chuyến đã được tài xế khác nhận hoặc không còn hợp lệ
+        '400':
+          description: Chuyến không ở trạng thái chờ tài xế nhận
+        '401':
+          description: Chưa xác thực
+        '403':
+          description: Người dùng không phải tài xế được phân công
+        '404':
+          description: Không tìm thấy chuyến
+  /trips/{maChuyen}/reject:
+    post:
+      tags:
+      - Trip Management
+      summary: Tài xế từ chối yêu cầu chuyến
+      operationId: rejectTrip
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectRequest'
+      responses:
+        '200':
+          description: Từ chối thành công; hệ thống tự động tiếp tục quy trình tìm
+            tài xế khác
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          description: Chuyến không ở trạng thái có thể từ chối
+        '401':
+          description: Chưa xác thực
+        '403':
+          description: Người dùng không phải tài xế được phân công
+        '404':
+          description: Không tìm thấy chuyến
+      description: Khi tài xế từ chối yêu cầu, hệ thống đưa yêu cầu trở lại quy trình
+        tìm tài xế và tự động tìm tài xế khác. Khách hàng không cần tạo lại yêu cầu.
+  /trips/{maChuyen}/status:
+    patch:
+      tags:
+      - Trip Management
+      summary: Cập nhật trạng thái chuyến
+      operationId: updateTripStatus
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripStatusUpdate'
+      responses:
+        '200':
+          description: Cập nhật trạng thái thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '409':
+          description: Trạng thái chuyển đổi không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy chuyến
+        '400':
+          description: Trạng thái mới không hợp lệ
+  /trips/{maChuyen}:
+    get:
+      tags:
+      - Trip Management
+      summary: Xem chi tiết chuyến
+      operationId: getTrip
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Chi tiết chuyến
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy chuyến
+  /trips:
+    get:
+      tags:
+      - Trip Management
+      summary: Nhân viên vận hành tra cứu chuyến xe
+      operationId: listTrips
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: query
+        name: trangThai
+        schema:
+          type: string
+      - in: query
+        name: tuNgay
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: denNgay
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Danh sách chuyến xe
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trip'
+        '403':
+          description: Không đủ quyền
+  /trips/{maChuyen}/incidents:
+    post:
+      tags:
+      - Trip Incident
+      summary: Ghi nhận và xử lý sự cố chuyến xe
+      operationId: createTripIncident
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripIncidentRequest'
+      responses:
+        '201':
+          description: Ghi nhận sự cố
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripIncident'
+        '403':
+          description: Không đủ quyền
+  /trips/{maChuyen}/incidents/{maSuCo}:
+    patch:
+      tags:
+      - Trip Incident
+      summary: Cập nhật xử lý sự cố chuyến xe
+      operationId: updateTripIncident
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      - in: path
+        name: maSuCo
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentUpdate'
+      responses:
+        '200':
+          description: Cập nhật xử lý sự cố thành công
+        '403':
+          description: Không đủ quyền
+components:
+  schemas:
+    TripStatusUpdate:
+      type: object
+      required:
+      - trangThai
+      properties:
+        trangThai:
+          type: string
+          enum:
+          - DA_DEN_DIEM_DON
+          - DA_DON_KHACH
+          - DANG_DI_CHUYEN
+          - HOAN_THANH
+    RejectRequest:
+      type: object
+      properties:
+        lyDo:
+          type: string
+    Trip:
+      type: object
+      properties:
+        maChuyen:
+          type: integer
+        maYeuCau:
+          type: integer
+        maKH:
+          type: integer
+        maTX:
+          type: integer
+          nullable: true
+        diemDon:
+          type: string
+        diemDen:
+          type: string
+        trangThai:
+          type: string
+          enum:
+          - CHO_TAI_XE_NHAN
+          - DA_NHAN
+          - DA_DEN_DIEM_DON
+          - DA_DON_KHACH
+          - DANG_DI_CHUYEN
+          - HOAN_THANH
+          - HUY
+        thoiGianBatDau:
+          type: string
+          format: date-time
+          nullable: true
+        thoiGianKetThuc:
+          type: string
+          format: date-time
+          nullable: true
+        thoiGianDuKienDen:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - maChuyen
+      - maYeuCau
+      - maKH
+      - diemDon
+      - diemDen
+      - trangThai
+    TripIncidentRequest:
+      type: object
+      required:
+      - moTa
+      properties:
+        moTa:
+          type: string
+    TripIncident:
+      type: object
+      properties:
+        maSuCo:
+          type: integer
+        maChuyen:
+          type: integer
+        moTa:
+          type: string
+        trangThaiXuLy:
+          type: string
+          enum:
+          - MOI
+          - DANG_XU_LY
+          - DA_XU_LY
+        thoiGianTao:
+          type: string
+          format: date-time
+    IncidentUpdate:
+      type: object
+      required:
+      - trangThaiXuLy
+      properties:
+        trangThaiXuLy:
+          type: string
+          enum:
+          - MOI
+          - DANG_XU_LY
+          - DA_XU_LY
+        ghiChuXuLy:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

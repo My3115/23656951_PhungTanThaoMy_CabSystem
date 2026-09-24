@@ -1,0 +1,154 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Trip Tracking API
+  version: 1.0.0
+  description: API cho UC04 - Theo dõi chuyến xe. Khách hàng có thể theo dõi cả trạng
+    thái yêu cầu đang tìm tài xế và trạng thái chuyến sau khi có tài xế.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Trip Tracking
+paths:
+  /trips/{maChuyen}/tracking:
+    get:
+      tags:
+      - Trip Tracking
+      summary: Theo dõi chuyến xe
+      operationId: trackTrip
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Trạng thái, thông tin tài xế, vị trí và thời gian dự kiến đến
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripTrackingResponse'
+        '404':
+          description: Không tìm thấy chuyến
+        '401':
+          description: Chưa xác thực
+        '403':
+          description: Không có quyền theo dõi chuyến này
+  /booking-requests/{maYeuCau}/tracking:
+    get:
+      tags:
+      - Trip Tracking
+      summary: Theo dõi trạng thái yêu cầu đặt chuyến
+      operationId: trackBookingRequest
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maYeuCau
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Trạng thái tìm và phân công tài xế
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingTrackingResponse'
+        '401':
+          description: Chưa xác thực
+        '403':
+          description: Không có quyền theo dõi yêu cầu này
+        '404':
+          description: Không tìm thấy yêu cầu
+components:
+  schemas:
+    TripTrackingResponse:
+      type: object
+      properties:
+        maChuyen:
+          type: integer
+        trangThai:
+          type: string
+        taiXe:
+          $ref: '#/components/schemas/DriverSummary'
+        viTriTaiXe:
+          $ref: '#/components/schemas/Location'
+        thoiGianDuKienDen:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - maChuyen
+      - trangThai
+    DriverSummary:
+      type: object
+      properties:
+        maTX:
+          type: integer
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        bienSo:
+          type: string
+          nullable: true
+        loaiXe:
+          type: string
+          nullable: true
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+    BookingTrackingResponse:
+      type: object
+      required:
+      - maYeuCau
+      - trangThai
+      properties:
+        maYeuCau:
+          type: integer
+        trangThai:
+          type: string
+          enum:
+          - CHO_TIM_TAI_XE
+          - CHO_TAI_XE_PHAN_HOI
+          - DA_CO_TAI_XE
+          - KHONG_TIM_THAY_TAI_XE
+        maTX:
+          type: integer
+          nullable: true
+        maChuyen:
+          type: integer
+          nullable: true
+        thoiGianDuKienDen:
+          type: string
+          format: date-time
+          nullable: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

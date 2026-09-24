@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Driver Matching and Assignment API
+  version: 1.0.0
+  description: API cho UC11 - Tìm và phân công tài xế. Hệ thống lựa chọn tài xế phù
+    hợp dựa trên vị trí, trạng thái sẵn sàng và tiêu chí vận hành. Nếu tài xế từ chối
+    hoặc không phản hồi theo thời gian được cấu hình, hệ thống tự động tiếp tục tìm
+    tài xế khác mà không yêu cầu khách hàng tạo lại yêu cầu.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Driver Matching
+paths:
+  /driver-matching/search:
+    post:
+      tags:
+      - Driver Matching
+      summary: Tìm tài xế phù hợp
+      operationId: searchSuitableDrivers
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DriverMatchingRequest'
+      responses:
+        '200':
+          description: Danh sách tài xế phù hợp
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DriverCandidate'
+        '404':
+          description: Không tìm được tài xế phù hợp
+  /driver-matching/assign:
+    post:
+      tags:
+      - Driver Matching
+      summary: Bắt đầu/tiếp tục tự động phân công tài xế
+      operationId: assignDriver
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignDriverRequest'
+      responses:
+        '409':
+          description: Tài xế không còn phù hợp hoặc yêu cầu đã được phân công
+        '201':
+          description: Phân công thành công và tạo chuyến
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchingAssignment'
+        '400':
+          description: Yêu cầu đặt chuyến không hợp lệ
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy yêu cầu hoặc tài xế
+      description: Hệ thống tự chọn tài xế phù hợp từ danh sách ứng viên và gửi yêu
+        cầu nhận chuyến. Khi tài xế từ chối hoặc không phản hồi theo thời gian được
+        cấu hình, hệ thống tiếp tục với tài xế khác.
+  /driver-matching/{maYeuCau}/result:
+    get:
+      tags:
+      - Driver Matching
+      summary: Xem kết quả tìm và phân công tài xế
+      operationId: getMatchingResult
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maYeuCau
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Kết quả tìm tài xế
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchingResult'
+      description: Kết quả phản ánh trạng thái hiện tại của quá trình tìm và phân
+        công; khi không tìm được tài xế, trạng thái KHONG_TIM_THAY_TAI_XE được trả
+        về.
+components:
+  schemas:
+    DriverMatchingRequest:
+      type: object
+      required:
+      - maYeuCau
+      properties:
+        maYeuCau:
+          type: integer
+    AssignDriverRequest:
+      type: object
+      required:
+      - maYeuCau
+      properties:
+        maYeuCau:
+          type: integer
+    DriverCandidate:
+      type: object
+      properties:
+        maTX:
+          type: integer
+        hoTen:
+          type: string
+        loaiXe:
+          type: string
+        trangThaiHoatDong:
+          type: string
+          enum:
+          - SAN_SANG
+        khoangCach:
+          type: number
+          format: double
+          description: Khoảng cách từ tài xế đến điểm đón; đơn vị do hệ thống quy
+            định
+    MatchingResult:
+      type: object
+      properties:
+        maYeuCau:
+          type: integer
+        trangThai:
+          type: string
+          enum:
+          - DANG_TIM_TAI_XE
+          - CHO_TAI_XE_PHAN_HOI
+          - DA_CO_TAI_XE
+          - KHONG_TIM_THAY_TAI_XE
+        maTX:
+          type: integer
+          nullable: true
+        soLanThu:
+          type: integer
+          minimum: 0
+        thongBao:
+          type: string
+          nullable: true
+    MatchingAssignment:
+      type: object
+      required:
+      - maYeuCau
+      - maTX
+      - maChuyen
+      - trangThai
+      properties:
+        maYeuCau:
+          type: integer
+        maTX:
+          type: integer
+        maChuyen:
+          type: integer
+        trangThai:
+          type: string
+          enum:
+          - CHO_TAI_XE_NHAN
+          - DA_NHAN
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,271 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Fare and Payment API
+  version: 1.0.0
+  description: API cho UC12 - Tính cước, UC13 - Thanh toán và UC19 - Tra cứu giao
+    dịch. CAB không lưu trực tiếp dữ liệu nhạy cảm của thẻ/tài khoản thanh toán điện
+    tử; giao dịch điện tử được xử lý qua nhà cung cấp bên ngoài.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Fare and Payment
+paths:
+  /fares/calculate:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Tính cước chuyến xe
+      operationId: calculateFare
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareCalculationRequest'
+      responses:
+        '200':
+          description: Kết quả tính cước
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fare'
+        '400':
+          description: Chuyến chưa hoàn thành hoặc thiếu thông tin cần thiết
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy chuyến
+  /payments:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Tạo yêu cầu thanh toán
+      operationId: createPayment
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '201':
+          description: Tạo thanh toán thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          description: Phương thức thanh toán không hợp lệ
+        '502':
+          description: Nhà cung cấp thanh toán điện tử không khả dụng
+      description: Tạo yêu cầu thanh toán. Với E_PAYMENT, CAB chuyển giao xử lý cho
+        nhà cung cấp bên ngoài và không lưu trực tiếp dữ liệu nhạy cảm của thẻ/tài
+        khoản.
+    get:
+      tags:
+      - Fare and Payment
+      summary: Tra cứu giao dịch thanh toán
+      operationId: listPayments
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách giao dịch
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+    parameters:
+    - in: query
+      name: maChuyen
+      schema:
+        type: integer
+    - in: query
+      name: trangThai
+      schema:
+        type: string
+        enum:
+        - CHO_THANH_TOAN
+        - THANH_CONG
+        - THAT_BAI
+    - in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    - in: query
+      name: size
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+  /payments/{maThanhToan}:
+    get:
+      tags:
+      - Fare and Payment
+      summary: Xem chi tiết giao dịch thanh toán
+      operationId: getPayment
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maThanhToan
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Chi tiết giao dịch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy giao dịch
+  /payments/{maThanhToan}/retry:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Thực hiện lại thanh toán điện tử khi thất bại
+      operationId: retryElectronicPayment
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maThanhToan
+        required: true
+        schema:
+          type: integer
+      responses:
+        '202':
+          description: Yêu cầu thanh toán lại đã được tiếp nhận
+        '400':
+          description: Giao dịch không đủ điều kiện retry theo chính sách doanh nghiệp
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy giao dịch
+      description: Thực hiện lại thanh toán điện tử khi giao dịch trước đó thất bại,
+        theo chính sách doanh nghiệp.
+  /payments/webhook:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Nhận kết quả từ nhà cung cấp thanh toán
+      operationId: paymentWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentWebhook'
+      responses:
+        '200':
+          description: Đã tiếp nhận kết quả
+components:
+  schemas:
+    FareCalculationRequest:
+      type: object
+      required:
+      - maChuyen
+      properties:
+        maChuyen:
+          type: integer
+    Fare:
+      type: object
+      properties:
+        maChuyen:
+          type: integer
+        soTien:
+          type: number
+          format: double
+        trangThai:
+          type: string
+          enum:
+          - DA_XAC_DINH
+          - LOI
+    PaymentRequest:
+      type: object
+      required:
+      - maChuyen
+      - phuongThuc
+      properties:
+        maChuyen:
+          type: integer
+        phuongThuc:
+          type: string
+          enum:
+          - CASH
+          - E_PAYMENT
+    Payment:
+      type: object
+      properties:
+        maThanhToan:
+          type: integer
+        maChuyen:
+          type: integer
+        soTien:
+          type: number
+          format: double
+        phuongThuc:
+          type: string
+          enum:
+          - CASH
+          - E_PAYMENT
+        trangThai:
+          type: string
+          enum:
+          - CHO_THANH_TOAN
+          - THANH_CONG
+          - THAT_BAI
+        thoiGianThanhToan:
+          type: string
+          format: date-time
+          nullable: true
+    PaymentWebhook:
+      type: object
+      required:
+      - transactionId
+      - status
+      - amount
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+          enum:
+          - SUCCESS
+          - FAILED
+        amount:
+          type: number
+          format: double
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

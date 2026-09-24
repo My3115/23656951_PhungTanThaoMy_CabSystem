@@ -1,0 +1,403 @@
+openapi: 3.0.3
+info:
+  title: CAB System - Driver Management API
+  version: 1.0.0
+  description: API cho UC01, UC07 và UC08. Tài xế có thể đăng ký tài khoản hoặc được
+    Nhân viên vận hành tạo tài khoản; sau khi đăng nhập có thể quản lý hồ sơ, trạng
+    thái, vị trí và phương tiện.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Driver Management
+- name: Vehicle Management
+paths:
+  /drivers:
+    post:
+      tags:
+      - Driver Management
+      summary: Nhân viên vận hành tạo tài khoản tài xế
+      operationId: createDriver
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDriverRequest'
+      responses:
+        '201':
+          description: Tạo tài khoản thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '403':
+          description: Không đủ quyền
+      description: Nhân viên vận hành có quyền phù hợp có thể tạo tài khoản tài xế
+        theo yêu cầu doanh nghiệp.
+    get:
+      tags:
+      - Driver Management
+      summary: Nhân viên vận hành tra cứu tài xế
+      operationId: listDrivers
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách tài xế
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Driver'
+        '403':
+          description: Không đủ quyền
+  /drivers/me:
+    get:
+      tags:
+      - Driver Management
+      summary: Xem hồ sơ tài xế
+      operationId: getMyDriverProfile
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Hồ sơ tài xế
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '401':
+          description: Chưa xác thực
+    put:
+      tags:
+      - Driver Management
+      summary: Cập nhật hồ sơ tài xế
+      operationId: updateMyDriverProfile
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DriverProfileUpdate'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '401':
+          description: Chưa xác thực
+  /drivers/me/status:
+    patch:
+      tags:
+      - Driver Management
+      summary: Cập nhật trạng thái hoạt động
+      operationId: updateDriverStatus
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+      responses:
+        '200':
+          description: Cập nhật trạng thái thành công
+        '401':
+          description: Chưa xác thực
+  /drivers/me/location:
+    patch:
+      tags:
+      - Driver Management
+      summary: Cập nhật vị trí hiện tại
+      operationId: updateDriverLocation
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationUpdate'
+      responses:
+        '200':
+          description: Cập nhật vị trí thành công
+        '401':
+          description: Chưa xác thực
+  /vehicles:
+    get:
+      tags:
+      - Vehicle Management
+      summary: Xem phương tiện của tài xế
+      operationId: listMyVehicles
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách phương tiện
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Chưa xác thực
+    post:
+      tags:
+      - Vehicle Management
+      summary: Thêm phương tiện
+      operationId: createVehicle
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleRequest'
+      responses:
+        '201':
+          description: Tạo phương tiện thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Chưa xác thực
+  /vehicles/{maPT}:
+    get:
+      tags:
+      - Vehicle Management
+      summary: Xem phương tiện
+      operationId: getVehicle
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maPT
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Thông tin phương tiện
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy tài nguyên
+    put:
+      tags:
+      - Vehicle Management
+      summary: Cập nhật phương tiện
+      operationId: updateVehicle
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maPT
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleRequest'
+      responses:
+        '200':
+          description: Cập nhật thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '401':
+          description: Chưa xác thực
+        '404':
+          description: Không tìm thấy tài nguyên
+  /drivers/{maTX}:
+    get:
+      tags:
+      - Driver Management
+      summary: Xem thông tin tài xế
+      operationId: getDriver
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maTX
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Thông tin tài xế
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '404':
+          description: Không tìm thấy tài nguyên
+  /auth/driver/register:
+    post:
+      tags:
+      - Authentication
+      summary: Đăng ký tài khoản tài xế
+      operationId: registerDriver
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDriverRequest'
+      responses:
+        '201':
+          description: Đăng ký tài khoản tài xế thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+        '400':
+          description: Thông tin đăng ký không hợp lệ
+        '409':
+          description: Tài khoản đã tồn tại
+components:
+  schemas:
+    CreateDriverRequest:
+      type: object
+      required:
+      - hoTen
+      - soDienThoai
+      - email
+      - matKhau
+      properties:
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+        matKhau:
+          type: string
+          format: password
+    DriverProfileUpdate:
+      type: object
+      properties:
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+    Driver:
+      type: object
+      properties:
+        maTX:
+          type: integer
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+        trangThaiHoatDong:
+          type: string
+          enum:
+          - SAN_SANG
+          - BAN
+          - OFFLINE
+        viTriHienTai:
+          $ref: '#/components/schemas/Location'
+    StatusUpdate:
+      type: object
+      required:
+      - trangThaiHoatDong
+      properties:
+        trangThaiHoatDong:
+          type: string
+          enum:
+          - SAN_SANG
+          - BAN
+          - OFFLINE
+    LocationUpdate:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+    Location:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+    VehicleRequest:
+      type: object
+      required:
+      - bienSo
+      - loaiXe
+      properties:
+        bienSo:
+          type: string
+        loaiXe:
+          type: string
+        thongTinPhuongTien:
+          type: string
+    Vehicle:
+      allOf:
+      - $ref: '#/components/schemas/VehicleRequest'
+      - type: object
+        properties:
+          maPT:
+            type: integer
+          maTX:
+            type: integer
+      required:
+      - maPT
+      - maTX
+      - bienSo
+      - loaiXe
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Dữ liệu yêu cầu không hợp lệ
+        details:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
