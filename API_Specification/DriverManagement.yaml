@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: Driver Management API
+  version: 1.0.0
+  description: API quản lý tài khoản, hồ sơ, trạng thái, vị trí và phương tiện của
+    tài xế.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Driver Management
+  description: Quản lý tài xế và phương tiện
+paths:
+  /drivers:
+    post:
+      tags:
+      - Driver Management
+      summary: Tạo tài khoản tài xế bởi vận hành
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Driver'
+      responses:
+        '201':
+          description: Tạo tài khoản tài xế thành công
+  /drivers/me:
+    get:
+      tags:
+      - Driver Management
+      summary: Xem hồ sơ tài xế
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Hồ sơ tài xế
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Driver'
+    put:
+      tags:
+      - Driver Management
+      summary: Cập nhật hồ sơ tài xế
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DriverProfileUpdate'
+      responses:
+        '200':
+          description: Cập nhật thành công
+  /drivers/me/status:
+    patch:
+      tags:
+      - Driver Management
+      summary: Cập nhật trạng thái hoạt động
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdate'
+      responses:
+        '200':
+          description: Cập nhật trạng thái thành công
+  /drivers/me/location:
+    patch:
+      tags:
+      - Driver Management
+      summary: Cập nhật vị trí hiện tại
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationUpdate'
+      responses:
+        '200':
+          description: Cập nhật vị trí thành công
+  /vehicles:
+    get:
+      tags:
+      - Driver Management
+      summary: Danh sách phương tiện
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách phương tiện
+    post:
+      tags:
+      - Driver Management
+      summary: Thêm phương tiện
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+      responses:
+        '201':
+          description: Tạo phương tiện thành công
+  /vehicles/{maPT}:
+    parameters:
+    - in: path
+      name: maPT
+      required: true
+      schema:
+        type: integer
+    get:
+      tags:
+      - Driver Management
+      summary: Xem phương tiện
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Thông tin phương tiện
+    put:
+      tags:
+      - Driver Management
+      summary: Cập nhật phương tiện
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vehicle'
+      responses:
+        '200':
+          description: Cập nhật thành công
+components:
+  schemas:
+    Driver:
+      type: object
+      properties:
+        maTX:
+          type: integer
+          example: 2001
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+        trangThaiHoatDong:
+          type: string
+          enum:
+          - SAN_SANG
+          - BAN
+          - OFFLINE
+        viTriHienTai:
+          type: object
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+    DriverProfileUpdate:
+      type: object
+      properties:
+        hoTen:
+          type: string
+        soDienThoai:
+          type: string
+        email:
+          type: string
+          format: email
+    StatusUpdate:
+      type: object
+      required:
+      - trangThaiHoatDong
+      properties:
+        trangThaiHoatDong:
+          type: string
+          enum:
+          - SAN_SANG
+          - BAN
+          - OFFLINE
+    LocationUpdate:
+      type: object
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          type: number
+          format: double
+        longitude:
+          type: number
+          format: double
+    Vehicle:
+      type: object
+      properties:
+        maPT:
+          type: integer
+        maTX:
+          type: integer
+        bienSo:
+          type: string
+        loaiXe:
+          type: string
+        thongTinPhuongTien:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

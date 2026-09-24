@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Book Ride API
+  version: 1.0.0
+  description: API tạo và tra cứu yêu cầu đặt chuyến. Không đặc tả chính sách hủy
+    vì SRS hiện chưa chốt chính sách hủy chuyến.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Ride Booking
+  description: Đặt chuyến
+paths:
+  /booking-requests:
+    post:
+      tags:
+      - Ride Booking
+      summary: Tạo yêu cầu đặt chuyến
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBookingRequest'
+      responses:
+        '201':
+          description: Tạo yêu cầu đặt chuyến thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+    get:
+      tags:
+      - Ride Booking
+      summary: Tra cứu yêu cầu đặt chuyến của khách hàng
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách yêu cầu đặt chuyến
+  /booking-requests/{maYeuCau}:
+    parameters:
+    - in: path
+      name: maYeuCau
+      required: true
+      schema:
+        type: integer
+    get:
+      tags:
+      - Ride Booking
+      summary: Xem chi tiết yêu cầu đặt chuyến
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Chi tiết yêu cầu đặt chuyến
+components:
+  schemas:
+    CreateBookingRequest:
+      type: object
+      required:
+      - diemDon
+      - diemDen
+      - loaiXe
+      properties:
+        diemDon:
+          type: string
+          example: Đại học Công nghiệp TP.HCM
+        diemDen:
+          type: string
+          example: Sân bay Tân Sơn Nhất
+        loaiXe:
+          type: string
+          example: CAR_4_SEATS
+    Booking:
+      type: object
+      properties:
+        maYeuCau:
+          type: integer
+          example: 5001
+        maKH:
+          type: integer
+          example: 1001
+        diemDon:
+          type: string
+        diemDen:
+          type: string
+        loaiXe:
+          type: string
+        trangThai:
+          type: string
+          enum:
+          - CHO_TIM_TAI_XE
+          - CHO_TAI_XE_PHAN_HOI
+          - DA_CO_TAI_XE
+          - KHONG_TIM_THAY_TAI_XE
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

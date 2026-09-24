@@ -1,0 +1,81 @@
+openapi: 3.0.3
+info:
+  title: Ride Rating API
+  version: 1.0.0
+  description: API đánh giá tài xế sau khi chuyến đi hoàn thành.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Ride Rating
+  description: Đánh giá chuyến
+paths:
+  /reviews:
+    post:
+      tags:
+      - Ride Rating
+      summary: Đánh giá tài xế sau khi chuyến hoàn thành
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReviewRequest'
+      responses:
+        '201':
+          description: Ghi nhận đánh giá
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+  /trips/{maChuyen}/review:
+    get:
+      tags:
+      - Ride Rating
+      summary: Xem đánh giá của chuyến
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maChuyen
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Thông tin đánh giá
+components:
+  schemas:
+    CreateReviewRequest:
+      type: object
+      required:
+      - maChuyen
+      - soSao
+      properties:
+        maChuyen:
+          type: integer
+        soSao:
+          type: integer
+          minimum: 1
+          maximum: 5
+        noiDung:
+          type: string
+    Review:
+      type: object
+      properties:
+        maDanhGia:
+          type: integer
+        maChuyen:
+          type: integer
+        maKH:
+          type: integer
+        soSao:
+          type: integer
+        noiDung:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

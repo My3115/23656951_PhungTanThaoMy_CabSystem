@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  title: Ride Booking Lifecycle API
+  version: 1.0.0
+  description: API hỗ trợ vòng đời yêu cầu đặt chuyến và trạng thái tìm tài xế. Không
+    đặc tả thời gian phản hồi tài xế hoặc chính sách hủy vì SRS chưa chốt.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Ride Booking
+  description: Vòng đời yêu cầu đặt chuyến
+paths:
+  /booking-requests/{maYeuCau}/status:
+    get:
+      tags:
+      - Ride Booking
+      summary: Theo dõi trạng thái yêu cầu đặt chuyến
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maYeuCau
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Trạng thái yêu cầu đặt chuyến
+  /booking-requests/{maYeuCau}/retry-matching:
+    post:
+      tags:
+      - Ride Booking
+      summary: Tiếp tục tìm tài xế cho yêu cầu hiện tại
+      security:
+      - bearerAuth: []
+      parameters:
+      - in: path
+        name: maYeuCau
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Yêu cầu được đưa lại vào quy trình tìm tài xế
+components:
+  schemas: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

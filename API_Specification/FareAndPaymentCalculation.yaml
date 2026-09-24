@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: Fare and Payment Calculation API
+  version: 1.0.0
+  description: API tính cước và thanh toán. Công thức tính cước chi tiết chưa được
+    SRS chốt; CAB không lưu trực tiếp dữ liệu thanh toán điện tử nhạy cảm.
+servers:
+- url: http://localhost:8080/api/v1
+tags:
+- name: Fare and Payment
+  description: Tính cước và thanh toán
+paths:
+  /fares/calculate:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Tính số tiền phải trả
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareCalculationRequest'
+      responses:
+        '200':
+          description: Kết quả tính cước
+  /payments:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Tạo giao dịch thanh toán
+      security:
+      - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '201':
+          description: Tạo giao dịch thanh toán
+    get:
+      tags:
+      - Fare and Payment
+      summary: Tra cứu giao dịch thanh toán của người dùng
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Danh sách giao dịch
+  /payments/webhook:
+    post:
+      tags:
+      - Fare and Payment
+      summary: Nhận kết quả từ nhà cung cấp thanh toán
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentWebhook'
+      responses:
+        '200':
+          description: Đã tiếp nhận kết quả
+components:
+  schemas:
+    FareCalculationRequest:
+      type: object
+      required:
+      - maChuyen
+      properties:
+        maChuyen:
+          type: integer
+    PaymentRequest:
+      type: object
+      required:
+      - maChuyen
+      - phuongThuc
+      properties:
+        maChuyen:
+          type: integer
+        phuongThuc:
+          type: string
+          enum:
+          - CASH
+          - E_PAYMENT
+    PaymentWebhook:
+      type: object
+      required:
+      - transactionId
+      - status
+      - amount
+      properties:
+        transactionId:
+          type: string
+        status:
+          type: string
+          enum:
+          - SUCCESS
+          - FAILED
+        amount:
+          type: number
+          format: double
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
